@@ -653,12 +653,52 @@
   text-decoration: underline;
 }
 
+/* ── Map expand button (mobile only) ─────────────────────── */
+.map-expand-btn {
+  display: none; /* hidden on desktop */
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
   .main {
     grid-template-columns: 1fr;
     grid-template-rows: auto 300px;
     height: auto;
+  }
+
+  .main.map-fullscreen {
+    grid-template-rows: 0 1fr;
+    height: calc(100svh - 56px - 36px);
+    overflow: hidden;
+  }
+
+  .main.map-fullscreen .panel {
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .map-expand-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 120px;
+    left: 10px;
+    z-index: 1000;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 2px solid rgba(0,0,0,.2);
+    background: var(--surface);
+    color: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 5px rgba(0,0,0,.2);
+    transition: background 0.15s;
+  }
+
+  .map-expand-btn:hover {
+    background: var(--chip-bg);
   }
 
   .header-left {
