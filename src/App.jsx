@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -57,23 +57,24 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-function MapUpdater({ center, zoom }) {
+// Only flies when navTarget.id changes — ignores user-initiated zoom/pan
+function MapUpdater({ navTarget }) {
   const map = useMap()
   useEffect(() => {
-    if (center) {
-      map.flyTo(center, zoom, { duration: 1.2 })
+    if (navTarget) {
+      map.flyTo(navTarget.center, navTarget.zoom, { duration: 1.2 })
     }
-  }, [center, zoom, map])
+  }, [navTarget?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   return null
 }
 
-function MapClickHandler({ onMapClick, onZoomChange }) {
+function MapClickHandler({ onMapClick, zoomRef }) {
   useMapEvents({
     click(e) {
       onMapClick(e.latlng.lat, e.latlng.lng)
     },
     zoomend(e) {
-      onZoomChange(e.target.getZoom())
+      zoomRef.current = e.target.getZoom()
     },
   })
   return null
@@ -286,8 +287,8 @@ export default function App() {
   const [error, setError] = useState('')
 
   // Map state
-  const [mapCenter, setMapCenter] = useState([20, 0])
-  const [mapZoom, setMapZoom] = useState(2)
+  const [navTarget, setNavTarget] = useState(null) // { center, zoom, id }
+  const zoomRef = useRef(2) // tracks live map zoom without triggering re-renders
   const [markerPos, setMarkerPos] = useState(null)
 
   // Locating state
@@ -329,8 +330,8 @@ export default function App() {
         fetchElevation(lat, lon),
       ])
       setResult({ lat, lon, address: addr, elevation })
-      setMapCenter([lat, lon])
-      if (!keepZoom) setMapZoom(prev => Math.max(prev, 13))
+      const zoom = keepZoom ? zoomRef.current : Math.max(zoomRef.current, 13)
+      setNavTarget({ center: [lat, lon], zoom, id: Date.now() })
       setMarkerPos([lat, lon])
       loadMoreInfo(lat, lon)
     } catch (e) {
@@ -349,8 +350,7 @@ export default function App() {
       const { lat, lon, displayName } = await geocodeAddress(address.trim())
       const elevation = await fetchElevation(lat, lon)
       setResult({ lat, lon, address: displayName, elevation })
-      setMapCenter([lat, lon])
-      setMapZoom(13)
+      setNavTarget({ center: [lat, lon], zoom: Math.max(zoomRef.current, 13), id: Date.now() })
       setMarkerPos([lat, lon])
       loadMoreInfo(lat, lon)
     } catch (e) {
@@ -411,8 +411,8 @@ export default function App() {
     setMoreExpanded(false)
     setError('')
     setMarkerPos(null)
-    setMapCenter([20, 0])
-    setMapZoom(2)
+    setNavTarget({ center: [20, 0], zoom: 2, id: Date.now() })
+    zoomRef.current = 2
   }
 
   return (
@@ -613,8 +613,8 @@ export default function App() {
 
         <div className="map-container">
           <MapContainer
-            center={mapCenter}
-            zoom={mapZoom}
+            center={[20, 0]}
+            zoom={2}
             style={{ height: '100%', width: '100%' }}
             zoomControl={true}
           >
@@ -630,8 +630,8 @@ export default function App() {
                 />
               )
             })()}
-            <MapUpdater center={mapCenter} zoom={mapZoom} />
-            <MapClickHandler onMapClick={handleMapClick} onZoomChange={setMapZoom} />
+            <MapUpdater navTarget={navTarget} />
+            <MapClickHandler onMapClick={handleMapClick} zoomRef={zoomRef} />
             {markerPos && (
               <Marker position={markerPos}>
                 <Popup>
