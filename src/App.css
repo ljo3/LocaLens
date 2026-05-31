@@ -757,7 +757,7 @@
 @media (max-width: 768px) {
   .main {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: minmax(0, 55svh) minmax(150px, 1fr);
   }
 
   .main.map-fullscreen {
@@ -807,6 +807,13 @@
   .panel {
     border-right: none;
     border-bottom: 1px solid var(--border);
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .map-style-picker {
+    bottom: auto;
+    top: 5px;
   }
 
   .footer {

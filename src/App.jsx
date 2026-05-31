@@ -68,9 +68,14 @@ function MapUpdater({ navTarget }) {
   return null
 }
 
-function MapInvalidator() {
+function MapResizeObserver() {
   const map = useMap()
-  useEffect(() => { map.invalidateSize() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    map.invalidateSize()
+    const ro = new ResizeObserver(() => map.invalidateSize())
+    ro.observe(map.getContainer())
+    return () => ro.disconnect()
+  }, [map])
   return null
 }
 
@@ -735,7 +740,7 @@ export default function App() {
                 />
               )
             })()}
-            <MapInvalidator />
+            <MapResizeObserver />
             <MapUpdater navTarget={navTarget} />
             <MapClickHandler onMapClick={handleMapClick} zoomRef={zoomRef} />
             {markerPos && (
