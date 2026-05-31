@@ -89,9 +89,8 @@ jobs:
 
           msg = MIMEText(body, 'plain')
           msg['Subject'] = "Poissy {}  UV {}  {}-{}C  {}".format(today_long[:3], uv, tmin, tmax, condition)
-          addr = 'lawrencejohny@gmail.com'
-          msg['From'] = addr
-          msg['To']   = addr
+          msg['From'] = 'lawrencejohny@gmail.com'
+          msg['To']   = 'lawrence.mk.johny@gmail.com'
 
           with smtplib.SMTP('smtp.gmail.com', 587) as s:
             s.starttls()
