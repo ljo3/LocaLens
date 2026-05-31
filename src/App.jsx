@@ -522,17 +522,25 @@ export default function App() {
           {mode === 'address' ? (
             <div className="input-group">
               <label className="input-label">Enter any address or place name</label>
-              <div className="input-row">
-                <input
-                  className="input"
-                  type="text"
-                  placeholder="e.g. Eiffel Tower, Paris"
-                  value={address}
-                  onChange={e => setAddress(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <button className="btn" onClick={handleAddressLookup} disabled={loading}>
+              <input
+                className="input"
+                type="text"
+                placeholder="e.g. Eiffel Tower, Paris"
+                value={address}
+                onChange={e => setAddress(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <div className="btn-row">
+                <button className="btn" onClick={handleAddressLookup} disabled={loading || locating}>
                   {loading ? <span className="spinner" /> : 'Search'}
+                </button>
+                <button
+                  className={`btn-locate ${locating ? 'locating' : ''}`}
+                  onClick={handleLocateMe}
+                  disabled={loading || locating}
+                  title="Use my location"
+                >
+                  <LocateIcon />
                 </button>
               </div>
             </div>
@@ -562,8 +570,18 @@ export default function App() {
                   min="-180"
                   max="180"
                 />
-                <button className="btn" onClick={handleCoordsLookup} disabled={loading}>
+              </div>
+              <div className="btn-row">
+                <button className="btn" onClick={handleCoordsLookup} disabled={loading || locating}>
                   {loading ? <span className="spinner" /> : 'Search'}
+                </button>
+                <button
+                  className={`btn-locate ${locating ? 'locating' : ''}`}
+                  onClick={handleLocateMe}
+                  disabled={loading || locating}
+                  title="Use my location"
+                >
+                  <LocateIcon />
                 </button>
               </div>
             </div>
