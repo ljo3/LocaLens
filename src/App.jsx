@@ -68,6 +68,12 @@ function MapUpdater({ navTarget }) {
   return null
 }
 
+function MapInvalidator() {
+  const map = useMap()
+  useEffect(() => { map.invalidateSize() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  return null
+}
+
 function MapClickHandler({ onMapClick, zoomRef }) {
   useMapEvents({
     click(e) {
@@ -729,6 +735,7 @@ export default function App() {
                 />
               )
             })()}
+            <MapInvalidator />
             <MapUpdater navTarget={navTarget} />
             <MapClickHandler onMapClick={handleMapClick} zoomRef={zoomRef} />
             {markerPos && (

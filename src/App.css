@@ -809,6 +809,10 @@
     border-bottom: 1px solid var(--border);
   }
 
+  .footer {
+    display: none;
+  }
+
   .app {
     height: 100svh;
     overflow: hidden;
