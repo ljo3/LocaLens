@@ -2,14 +2,19 @@ name: Daily Weather · Poissy
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # 7 AM Paris time (CEST/UTC+2). In winter (CET) this arrives at 6 AM.
-  workflow_dispatch:      # lets you trigger manually to test
+    - cron: '0 5 * * *'  # 7 AM Paris time (CEST/UTC+2). In winter (CET) arrives at 6 AM.
+  workflow_dispatch:      # trigger manually to test
+
+permissions:
+  contents: write         # needed to push the log commit
 
 jobs:
   send-weather:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch weather and send email
+      - uses: actions/checkout@v4
+
+      - name: Fetch weather, send email, append to log
         env:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
@@ -40,22 +45,22 @@ jobs:
           with urllib.request.urlopen(url) as r:
             data = json.loads(r.read())
 
-          d  = data['daily']
-          c  = data['current']
-          today = datetime.now().strftime('%A %d %B %Y')
+          d = data['daily']
+          c = data['current']
 
-          condition    = WMO.get(d['weathercode'][0], f"Code {d['weathercode'][0]}")
-          tmax         = d['temperature_2m_max'][0]
-          tmin         = d['temperature_2m_min'][0]
-          uv           = d['uv_index_max'][0]
-          rain_prob    = d['precipitation_probability_max'][0]
-          rain_mm      = d['precipitation_sum'][0]
-          sunrise      = d['sunrise'][0].split('T')[1]
-          sunset       = d['sunset'][0].split('T')[1]
-          temp_now     = c['temperature_2m']
-          humidity     = c['relative_humidity_2m']
-          wind         = c['wind_speed_10m']
+          condition = WMO.get(d['weathercode'][0], f"Code {d['weathercode'][0]}")
+          tmax      = d['temperature_2m_max'][0]
+          tmin      = d['temperature_2m_min'][0]
+          uv        = d['uv_index_max'][0]
+          rain_prob = d['precipitation_probability_max'][0]
+          rain_mm   = d['precipitation_sum'][0]
+          sunrise   = d['sunrise'][0].split('T')[1]
+          sunset    = d['sunset'][0].split('T')[1]
+          temp_now  = c['temperature_2m']
+          humidity  = c['relative_humidity_2m']
+          wind      = c['wind_speed_10m']
 
+          uv_dot    = "🟢" if uv < 3 else "🟡" if uv < 6 else "🟠" if uv < 8 else "🔴" if uv < 11 else "🟣"
           uv_advice = (
             "Low · no protection needed"        if uv < 3  else
             "Moderate · sunscreen if out >1 h"  if uv < 6  else
@@ -63,9 +68,12 @@ jobs:
             "Very High · limit midday exposure" if uv < 11 else
             "Extreme · avoid sun 10 am – 4 pm"
           )
-          uv_dot = "🟢" if uv < 3 else "🟡" if uv < 6 else "🟠" if uv < 8 else "🔴" if uv < 11 else "🟣"
 
-          body = f"""Good morning! Weather for Poissy on {today}
+          today_long  = datetime.now().strftime('%A %d %B %Y')
+          today_short = datetime.now().strftime('%Y-%m-%d %a')
+
+          # ── Email ────────────────────────────────────────────
+          body = f"""Good morning! Weather for Poissy on {today_long}
 
 Condition    {condition}
 Now          {temp_now}°C  ·  humidity {humidity}%  ·  wind {wind} km/h
@@ -77,9 +85,8 @@ UV Index     {uv}  {uv_dot}  {uv_advice}
 
 — LocaLens Daily  ·  localens.pages.dev
 """
-
           msg = MIMEText(body, 'plain')
-          msg['Subject'] = f"☀️ Poissy {today[:3]}  UV {uv}  {tmin}–{tmax}°C  {condition}"
+          msg['Subject'] = f"☀️ Poissy {today_long[:3]}  UV {uv}  {tmin}–{tmax}°C  {condition}"
           msg['From']    = 'lawrence.mk.johny@gmail.com'
           msg['To']      = 'lawrence.mk.johny@gmail.com'
 
@@ -88,4 +95,31 @@ UV Index     {uv}  {uv_dot}  {uv_advice}
             s.login('lawrence.mk.johny@gmail.com', os.environ['GMAIL_APP_PASSWORD'])
             s.send_message(msg)
             print("Email sent.")
+
+          # ── Weather log ──────────────────────────────────────
+          log_path = 'weather-log.md'
+          header = (
+            "# 🌤 Poissy — Daily Weather Log\n\n"
+            "| Date | Condition | Temp | UV | Rain |\n"
+            "|------|-----------|------|----|------|\n"
+          )
+
+          row = f"| {today_short} | {condition} | {tmin}–{tmax}°C | {uv} {uv_dot} | {rain_prob}% |\n"
+
+          if not os.path.exists(log_path):
+            with open(log_path, 'w') as f:
+              f.write(header)
+
+          with open(log_path, 'a') as f:
+            f.write(row)
+
+          print(f"Log updated: {row.strip()}")
           PYEOF
+
+      - name: Commit weather log
+        run: |
+          git config user.name  "ljo3"
+          git config user.email "lawrence.mk.johny@gmail.com"
+          git add weather-log.md
+          git diff --staged --quiet || git commit -m "🌤 Poissy weather · $(date -u +%Y-%m-%d)"
+          git push
