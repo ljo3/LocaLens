@@ -72,8 +72,8 @@ jobs:
           today_long  = datetime.now().strftime('%A %d %B %Y')
           today_short = datetime.now().strftime('%Y-%m-%d %a')
 
-          td_l = "style='padding:8px 20px 8px 0;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top'"
-          td_r = "style='padding:8px 0;font-size:14px;font-weight:500;color:#111'"
+          td_l = "style='padding:8px 20px 8px 12px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:160px'"
+          td_r = "style='padding:8px 12px 8px 0;font-size:14px;font-weight:500;color:#111'"
 
           def row_html(label, value, shade):
             bg = "#f9fafb" if shade else "#ffffff"
