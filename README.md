@@ -4,7 +4,9 @@
 
 ![LocaLens](https://img.shields.io/badge/built%20with-React%20%2B%20Vite-61dafb?style=flat-square&logo=react)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
-![Deploy](https://img.shields.io/badge/deploy-Cloudflare%20Pages-orange?style=flat-square&logo=cloudflare)
+[![Deploy](https://img.shields.io/badge/deploy-Cloudflare%20Pages-orange?style=flat-square&logo=cloudflare)](https://localens.pages.dev)
+
+**Live:** [localens.pages.dev](https://localens.pages.dev)
 
 LocaLens is a static, zero-backend web app for exploring any location on Earth. Search by address or coordinates, drop a pin anywhere on the map, and instantly get elevation, live weather, sunrise/sunset, timezone, DMS coordinates, and more.
 
