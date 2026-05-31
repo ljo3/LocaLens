@@ -94,7 +94,7 @@ jobs:
 
           with smtplib.SMTP('smtp.gmail.com', 587) as s:
             s.starttls()
-            s.login(addr, os.environ['GMAIL_APP_PASSWORD'])
+            s.login('lawrencejohny@gmail.com', os.environ['GMAIL_APP_PASSWORD'])
             s.send_message(msg)
             print("Email sent.")
 
