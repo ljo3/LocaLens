@@ -1,4 +1,4 @@
-# Handoff — 2026-05-31 20:57:40 CEST
+# Handoff — 2026-05-31 21:30:50 CEST
 
 ## What was built this session
 
@@ -17,6 +17,16 @@
 - Umbrella tip shown when UV > 4
 - Appends a row to `weather-log.md` and commits as `ljo3` — counts as daily GitHub contribution
 - Requires one GitHub secret: `GMAIL_APP_PASSWORD` (App Password from lawrencejohny@gmail.com account)
+
+### Reveal.js slide deck (`slides.html`)
+- Self-contained presentation using the project design system (light/dark mode, CSS tokens, all components)
+- 7 slides: Title → Architecture → What is LocaLens? → Feature Set → Lookup Pipeline → Tech Stack → Deployment
+- Architecture slide has inline SVG big-picture diagram (User → App panels → APIs → Cloudflare Pages)
+- Slide counter shown at bottom-centre as `current/total` (e.g. `1/7`)
+- `make-slides` skill converted from flat `.md` to proper `SKILL.md` format; template updated with centered slide numbers
+
+### Project tooling
+- `CLAUDE.md` added to repo (was previously untracked)
 
 ## Current state
 - App is live at [localens.pages.dev](https://localens.pages.dev) (Cloudflare Pages, auto-deploys on push)
