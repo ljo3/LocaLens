@@ -540,6 +540,66 @@
   letter-spacing: 0.05em;
 }
 
+/* ── Georisques risk rows ────────────────────────────────── */
+.risk-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.83rem;
+}
+
+.risk-name {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text);
+}
+
+.risk-badge {
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 0.12rem 0.5rem;
+  border-radius: 99px;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.risk-badge--high {
+  background: #fee2e2;
+  color: #991b1b;
+}
+[data-theme="dark"] .risk-badge--high {
+  background: rgba(127,29,29,.45);
+  color: #fca5a5;
+}
+
+.risk-badge--medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+[data-theme="dark"] .risk-badge--medium {
+  background: rgba(120,53,15,.45);
+  color: #fcd34d;
+}
+
+.risk-badge--low {
+  background: #dcfce7;
+  color: #166534;
+}
+[data-theme="dark"] .risk-badge--low {
+  background: rgba(20,83,45,.45);
+  color: #86efac;
+}
+
+.risk-source-note {
+  font-size: 0.69rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  opacity: 0.7;
+}
+
 /* ── Map hint ────────────────────────────────────────────── */
 .map-hint {
   display: flex;

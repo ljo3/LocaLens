@@ -169,6 +169,66 @@ function toGeohash(lat, lon, precision = 8) {
   return geohash
 }
 
+const GEORISQUES_RISKS = {
+  inondation:                       { emoji: '🌊', label: 'Flood' },
+  remonteeNappe:                    { emoji: '💧', label: 'Groundwater rise' },
+  seisme:                           { emoji: '🫨', label: 'Earthquake' },
+  mouvementTerrain:                 { emoji: '⛰️', label: 'Ground movement' },
+  retraitGonflementArgile:          { emoji: '🏗️', label: 'Clay shrinkage' },
+  reculTraitCote:                   { emoji: '🌊', label: 'Coastal erosion' },
+  risqueCotier:                     { emoji: '🌊', label: 'Coastal risk' },
+  avalanche:                        { emoji: '🏔️', label: 'Avalanche' },
+  feuForet:                         { emoji: '🔥', label: 'Forest fire' },
+  eruptionVolcanique:               { emoji: '🌋', label: 'Volcanic eruption' },
+  cyclone:                          { emoji: '🌪️', label: 'Strong winds' },
+  radon:                            { emoji: '☢️', label: 'Radon' },
+  icpe:                             { emoji: '🏭', label: 'Industrial sites' },
+  nucleaire:                        { emoji: '☢️', label: 'Nuclear' },
+  canalisationsMatieresDangereuses: { emoji: '⚗️', label: 'Hazardous pipelines' },
+  pollutionSols:                    { emoji: '🧪', label: 'Soil pollution' },
+  ruptureBarrage:                   { emoji: '💦', label: 'Dam breach' },
+  risqueMinier:                     { emoji: '⛏️', label: 'Mining risk' },
+}
+
+function riskSeverity(libelle) {
+  if (!libelle) return 'medium'
+  const l = libelle.toLowerCase()
+  if (l.includes('important') || l.includes('élevé') || l.includes('fort')) return 'high'
+  if (l.includes('faible')) return 'low'
+  return 'medium'
+}
+
+function activeRisks(riskObj) {
+  return Object.entries(riskObj ?? {})
+    .filter(([, v]) => v?.present)
+    .map(([key, v]) => ({
+      key,
+      emoji: GEORISQUES_RISKS[key]?.emoji ?? '⚠️',
+      label: GEORISQUES_RISKS[key]?.label ?? key,
+      severity: riskSeverity(v.libelleStatutCommune),
+    }))
+}
+
+async function fetchGeorisques(lat, lon) {
+  const r1 = await fetch(`https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lon}&fields=code,nom`)
+  if (!r1.ok) return null
+  const communes = await r1.json()
+  if (!communes.length) return null
+  const { code, nom } = communes[0]
+  const r2 = await fetch(
+    `https://georisques.gouv.fr/api/v1/resultats_rapport_risque?code_insee=${code}`,
+    { headers: { Accept: 'application/json' } }
+  )
+  if (!r2.ok) return null
+  const data = await r2.json()
+  return {
+    commune: nom,
+    codeInsee: code,
+    natural: activeRisks(data.risquesNaturels),
+    tech: activeRisks(data.risquesTechnologiques),
+  }
+}
+
 const WMO = {
   0: ['☀️', 'Clear sky'], 1: ['🌤️', 'Mainly clear'], 2: ['⛅', 'Partly cloudy'], 3: ['☁️', 'Overcast'],
   45: ['🌫️', 'Fog'], 48: ['🌫️', 'Icy fog'],
@@ -306,8 +366,11 @@ export default function App() {
     setMoreExpanded(false)
     setMoreLoading(true)
     try {
-      const info = await fetchMoreInfo(lat, lon)
-      setMoreInfo(info)
+      const [info, georisques] = await Promise.all([
+        fetchMoreInfo(lat, lon),
+        fetchGeorisques(lat, lon).catch(() => null),
+      ])
+      setMoreInfo({ ...info, georisques })
     } catch {
       // silently fail — extra metrics are non-critical
     } finally {
@@ -600,6 +663,24 @@ export default function App() {
                     <div className="more-row"><span className="more-label">Lon (DMS)</span><span className="more-val">{moreInfo.dmsLon}</span></div>
                     <div className="more-row"><span className="more-label">Geohash</span><span className="more-val mono">{moreInfo.geohash}</span></div>
                   </div>
+                  {moreInfo.georisques && (() => {
+                    const risks = [...moreInfo.georisques.natural, ...moreInfo.georisques.tech]
+                    if (!risks.length) return null
+                    return (
+                      <div className="more-section">
+                        <div className="more-section-title">🏛️ Risks · {moreInfo.georisques.commune}</div>
+                        {risks.map(r => (
+                          <div key={r.key} className="risk-row">
+                            <span className="risk-name">{r.emoji} {r.label}</span>
+                            <span className={`risk-badge risk-badge--${r.severity}`}>
+                              {r.severity === 'high' ? 'High' : r.severity === 'low' ? 'Low' : 'Present'}
+                            </span>
+                          </div>
+                        ))}
+                        <div className="risk-source-note">Géorisques · commune level</div>
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
             </div>
