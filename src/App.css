@@ -757,13 +757,11 @@
 @media (max-width: 768px) {
   .main {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 300px;
-    height: auto;
+    grid-template-rows: auto 1fr;
   }
 
   .main.map-fullscreen {
     grid-template-rows: 0 1fr;
-    height: calc(100svh - 56px - 36px);
     overflow: hidden;
   }
 
@@ -812,8 +810,7 @@
   }
 
   .app {
-    height: auto;
-    min-height: 100svh;
-    overflow-y: auto;
+    height: 100svh;
+    overflow: hidden;
   }
 }
