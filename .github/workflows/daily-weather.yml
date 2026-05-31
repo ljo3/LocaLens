@@ -24,12 +24,12 @@ jobs:
           from datetime import datetime
 
           WMO = {
-            0: "Clear sky ☀️", 1: "Mainly clear 🌤️", 2: "Partly cloudy ⛅", 3: "Overcast ☁️",
-            45: "Fog 🌫️", 48: "Icy fog 🌫️",
-            51: "Light drizzle 🌦️", 53: "Drizzle 🌦️", 55: "Heavy drizzle 🌦️",
-            61: "Light rain 🌧️", 63: "Rain 🌧️", 65: "Heavy rain 🌧️",
-            71: "Light snow 🌨️", 73: "Snow 🌨️", 75: "Heavy snow ❄️",
-            80: "Light showers 🌦️", 81: "Showers 🌦️", 82: "Heavy showers ⛈️",
+            0: "Clear sky ☀️", 1: "Mainly clear \U0001f324️", 2: "Partly cloudy ⛅", 3: "Overcast ☁️",
+            45: "Fog \U0001f32b️", 48: "Icy fog \U0001f32b️",
+            51: "Light drizzle \U0001f326️", 53: "Drizzle \U0001f326️", 55: "Heavy drizzle \U0001f326️",
+            61: "Light rain \U0001f327️", 63: "Rain \U0001f327️", 65: "Heavy rain \U0001f327️",
+            71: "Light snow \U0001f328️", 73: "Snow \U0001f328️", 75: "Heavy snow ❄️",
+            80: "Light showers \U0001f326️", 81: "Showers \U0001f326️", 82: "Heavy showers ⛈️",
             95: "Thunderstorm ⛈️", 96: "Thunderstorm + hail ⛈️", 99: "Thunderstorm + heavy hail ⛈️",
           }
 
@@ -48,7 +48,7 @@ jobs:
           d = data['daily']
           c = data['current']
 
-          condition = WMO.get(d['weathercode'][0], f"Code {d['weathercode'][0]}")
+          condition = WMO.get(d['weathercode'][0], "Code {}".format(d['weathercode'][0]))
           tmax      = d['temperature_2m_max'][0]
           tmin      = d['temperature_2m_min'][0]
           uv        = d['uv_index_max'][0]
@@ -60,33 +60,35 @@ jobs:
           humidity  = c['relative_humidity_2m']
           wind      = c['wind_speed_10m']
 
-          uv_dot    = "🟢" if uv < 3 else "🟡" if uv < 6 else "🟠" if uv < 8 else "🔴" if uv < 11 else "🟣"
+          uv_dot    = "\U0001f7e2" if uv < 3 else "\U0001f7e1" if uv < 6 else "\U0001f7e0" if uv < 8 else "\U0001f534" if uv < 11 else "\U0001f7e3"
           uv_advice = (
-            "Low · no protection needed"        if uv < 3  else
-            "Moderate · sunscreen if out >1 h"  if uv < 6  else
-            "High · sunscreen + hat"            if uv < 8  else
-            "Very High · limit midday exposure" if uv < 11 else
-            "Extreme · avoid sun 10 am – 4 pm"
+            "Low - no protection needed"        if uv < 3  else
+            "Moderate - sunscreen if out >1 h"  if uv < 6  else
+            "High - sunscreen + hat"            if uv < 8  else
+            "Very High - limit midday exposure" if uv < 11 else
+            "Extreme - avoid sun 10 am to 4 pm"
           )
 
           today_long  = datetime.now().strftime('%A %d %B %Y')
           today_short = datetime.now().strftime('%Y-%m-%d %a')
 
-          # ── Email ────────────────────────────────────────────
-          body = f"""Good morning! Weather for Poissy on {today_long}
+          lines = [
+            "Good morning! Weather for Poissy on {}".format(today_long),
+            "",
+            "Condition    {}".format(condition),
+            "Now          {}C  humidity {}%  wind {} km/h".format(temp_now, humidity, wind),
+            "Today        {}C - {}C".format(tmin, tmax),
+            "Rain         {}% chance  ({} mm expected)".format(rain_prob, rain_mm),
+            "Sunrise      {}   Sunset {}".format(sunrise, sunset),
+            "",
+            "UV Index     {}  {}  {}".format(uv, uv_dot, uv_advice),
+            "",
+            "-- LocaLens Daily  localens.pages.dev",
+          ]
+          body = "\n".join(lines)
 
-Condition    {condition}
-Now          {temp_now}°C  ·  humidity {humidity}%  ·  wind {wind} km/h
-Today        {tmin}°C – {tmax}°C
-Rain         {rain_prob}% chance  ({rain_mm} mm expected)
-Sunrise      {sunrise}   Sunset {sunset}
-
-UV Index     {uv}  {uv_dot}  {uv_advice}
-
-— LocaLens Daily  ·  localens.pages.dev
-"""
           msg = MIMEText(body, 'plain')
-          msg['Subject'] = f"☀️ Poissy {today_long[:3]}  UV {uv}  {tmin}–{tmax}°C  {condition}"
+          msg['Subject'] = "Poissy {}  UV {}  {}-{}C  {}".format(today_long[:3], uv, tmin, tmax, condition)
           msg['From']    = 'lawrence.mk.johny@gmail.com'
           msg['To']      = 'lawrence.mk.johny@gmail.com'
 
@@ -96,15 +98,15 @@ UV Index     {uv}  {uv_dot}  {uv_advice}
             s.send_message(msg)
             print("Email sent.")
 
-          # ── Weather log ──────────────────────────────────────
           log_path = 'weather-log.md'
           header = (
-            "# 🌤 Poissy — Daily Weather Log\n\n"
+            "# Poissy - Daily Weather Log\n\n"
             "| Date | Condition | Temp | UV | Rain |\n"
             "|------|-----------|------|----|------|\n"
           )
-
-          row = f"| {today_short} | {condition} | {tmin}–{tmax}°C | {uv} {uv_dot} | {rain_prob}% |\n"
+          row = "| {} | {} | {}-{}C | {} {} | {}% |\n".format(
+            today_short, condition, tmin, tmax, uv, uv_dot, rain_prob
+          )
 
           if not os.path.exists(log_path):
             with open(log_path, 'w') as f:
@@ -113,7 +115,7 @@ UV Index     {uv}  {uv_dot}  {uv_advice}
           with open(log_path, 'a') as f:
             f.write(row)
 
-          print(f"Log updated: {row.strip()}")
+          print("Log updated: {}".format(row.strip()))
           PYEOF
 
       - name: Commit weather log
@@ -121,5 +123,5 @@ UV Index     {uv}  {uv_dot}  {uv_advice}
           git config user.name  "ljo3"
           git config user.email "lawrence.mk.johny@gmail.com"
           git add weather-log.md
-          git diff --staged --quiet || git commit -m "🌤 Poissy weather · $(date -u +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "Weather log $(date -u +%Y-%m-%d)"
           git push
