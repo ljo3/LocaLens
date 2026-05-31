@@ -72,27 +72,49 @@ jobs:
           today_long  = datetime.now().strftime('%A %d %B %Y')
           today_short = datetime.now().strftime('%Y-%m-%d %a')
 
-          umbrella = (
-            ["\U0001f302  Take an umbrella — UV is moderate to high today."]
-            if uv > 4 else []
-          )
+          td_l = "style='padding:8px 20px 8px 0;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top'"
+          td_r = "style='padding:8px 0;font-size:14px;font-weight:500;color:#111'"
 
-          lines = [
-            "Good morning! Poissy · {}".format(today_long),
-            "",
-            "{}  {}".format(uv_dot, condition),
-            "\U0001f321  {}C now  ·  {}C – {}C today".format(temp_now, tmin, tmax),
-            "\U0001f4a7  {}% rain  ·  {} mm  ·  humidity {}%  ·  wind {} km/h".format(rain_prob, rain_mm, humidity, wind),
-            "\U0001f305  Sunrise {}  ·  Sunset {}".format(sunrise, sunset),
-            "",
-            "☀️  UV {}  {}  {}".format(uv, uv_dot, uv_advice),
-          ] + umbrella + [
-            "",
-            "-- LocaLens Daily  localens.pages.dev",
-          ]
-          body = "\n".join(lines)
+          def row_html(label, value, shade):
+            bg = "#f9fafb" if shade else "#ffffff"
+            return "<tr style='background:{}'><td {}>{}</td><td {}>{}</td></tr>".format(
+              bg, td_l, label, td_r, value)
 
-          msg = MIMEText(body, 'plain')
+          table_rows = "".join([
+            row_html("Condition",       condition, 0),
+            row_html("Temperature",     "{}&#176;C now &nbsp;&middot;&nbsp; {}&#176;C &ndash; {}&#176;C today".format(temp_now, tmin, tmax), 1),
+            row_html("Rain",            "{}% chance &nbsp;&middot;&nbsp; {} mm".format(rain_prob, rain_mm), 0),
+            row_html("Humidity / Wind", "{}% &nbsp;&middot;&nbsp; {} km/h".format(humidity, wind), 1),
+            row_html("Sunrise / Sunset","{}  &nbsp;&middot;&nbsp;  {}".format(sunrise, sunset), 0),
+            row_html("UV Index",        "{} {} &nbsp; {}".format(uv, uv_dot, uv_advice), 1),
+          ])
+
+          umbrella_html = ""
+          if uv > 4:
+            umbrella_html = (
+              "<div style='margin-top:16px;padding:12px 16px;background:#fffbeb;"
+              "border-left:3px solid #f59e0b;border-radius:4px;font-size:14px'>"
+              "\U0001f302 Take an umbrella &mdash; UV is moderate to high today."
+              "</div>"
+            )
+
+          html = "".join([
+            "<!DOCTYPE html><html><body style='font-family:system-ui,-apple-system,sans-serif;",
+            "color:#111;max-width:500px;margin:0 auto;padding:24px'>",
+            "<p style='font-size:20px;font-weight:700;margin:0 0 4px'>Good morning! \U0001f4cd Poissy</p>",
+            "<p style='color:#9ca3af;margin:0 0 20px;font-size:14px'>{}</p>".format(today_long),
+            "<table style='width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;",
+            "border:1px solid #e5e7eb'>",
+            table_rows,
+            "</table>",
+            umbrella_html,
+            "<p style='margin-top:24px;font-size:12px;color:#9ca3af'>",
+            "LocaLens Daily &nbsp;&middot;&nbsp; ",
+            "<a href='https://localens.pages.dev' style='color:#2563eb;text-decoration:none'>localens.pages.dev</a>",
+            "</p></body></html>",
+          ])
+
+          msg = MIMEText(html, 'html')
           msg['Subject'] = "Poissy {}  UV {}  {}-{}C  {}".format(today_long[:3], uv, tmin, tmax, condition)
           msg['From'] = 'lawrencejohny@gmail.com'
           msg['To']   = 'lawrence.mk.johny@gmail.com'
