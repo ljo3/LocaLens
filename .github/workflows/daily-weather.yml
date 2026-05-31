@@ -89,12 +89,13 @@ jobs:
 
           msg = MIMEText(body, 'plain')
           msg['Subject'] = "Poissy {}  UV {}  {}-{}C  {}".format(today_long[:3], uv, tmin, tmax, condition)
-          msg['From']    = 'lawrence.mk.johny@gmail.com'
-          msg['To']      = 'lawrence.mk.johny@gmail.com'
+          addr = 'lawrencejohny@gmail.com'
+          msg['From'] = addr
+          msg['To']   = addr
 
           with smtplib.SMTP('smtp.gmail.com', 587) as s:
             s.starttls()
-            s.login('lawrence.mk.johny@gmail.com', os.environ['GMAIL_APP_PASSWORD'])
+            s.login(addr, os.environ['GMAIL_APP_PASSWORD'])
             s.send_message(msg)
             print("Email sent.")
 
