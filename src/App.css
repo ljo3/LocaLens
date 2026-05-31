@@ -57,7 +57,8 @@
 
 /* ── Layout ─────────────────────────────────────────────── */
 .app {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -153,11 +154,11 @@
 /* ── Main ────────────────────────────────────────────────── */
 .main {
   flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: 420px 1fr;
   grid-template-rows: 1fr;
   overflow: hidden;
-  height: calc(100vh - 56px - 36px);
 }
 
 /* ── Panel ────────────────────────────────────────────────── */
@@ -811,6 +812,8 @@
   }
 
   .app {
+    height: auto;
     min-height: 100svh;
+    overflow-y: auto;
   }
 }
