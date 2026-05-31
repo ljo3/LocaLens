@@ -124,4 +124,5 @@ jobs:
           git config user.email "lawrence.mk.johny@gmail.com"
           git add weather-log.md
           git diff --staged --quiet || git commit -m "Weather log $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
