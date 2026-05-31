@@ -72,16 +72,21 @@ jobs:
           today_long  = datetime.now().strftime('%A %d %B %Y')
           today_short = datetime.now().strftime('%Y-%m-%d %a')
 
+          umbrella = (
+            ["\U0001f302  Take an umbrella — UV is moderate to high today."]
+            if uv > 4 else []
+          )
+
           lines = [
-            "Good morning! Weather for Poissy on {}".format(today_long),
+            "Good morning! Poissy · {}".format(today_long),
             "",
-            "Condition    {}".format(condition),
-            "Now          {}C  humidity {}%  wind {} km/h".format(temp_now, humidity, wind),
-            "Today        {}C - {}C".format(tmin, tmax),
-            "Rain         {}% chance  ({} mm expected)".format(rain_prob, rain_mm),
-            "Sunrise      {}   Sunset {}".format(sunrise, sunset),
+            "{}  {}".format(uv_dot, condition),
+            "\U0001f321  {}C now  ·  {}C – {}C today".format(temp_now, tmin, tmax),
+            "\U0001f4a7  {}% rain  ·  {} mm  ·  humidity {}%  ·  wind {} km/h".format(rain_prob, rain_mm, humidity, wind),
+            "\U0001f305  Sunrise {}  ·  Sunset {}".format(sunrise, sunset),
             "",
-            "UV Index     {}  {}  {}".format(uv, uv_dot, uv_advice),
+            "☀️  UV {}  {}  {}".format(uv, uv_dot, uv_advice),
+          ] + umbrella + [
             "",
             "-- LocaLens Daily  localens.pages.dev",
           ]
