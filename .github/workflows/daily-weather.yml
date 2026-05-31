@@ -72,8 +72,8 @@ jobs:
           today_long  = datetime.now().strftime('%A %d %B %Y')
           today_short = datetime.now().strftime('%Y-%m-%d %a')
 
-          td_l = "style='padding:8px 20px 8px 12px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:160px'"
-          td_r = "style='padding:8px 12px 8px 0;font-size:14px;font-weight:500;color:#111'"
+          td_l = "style='padding:10px 24px 10px 16px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:200px'"
+          td_r = "style='padding:10px 16px 10px 0;font-size:14px;font-weight:500;color:#111'"
 
           def row_html(label, value, shade):
             bg = "#f9fafb" if shade else "#ffffff"
@@ -100,7 +100,7 @@ jobs:
 
           html = "".join([
             "<!DOCTYPE html><html><body style='font-family:system-ui,-apple-system,sans-serif;",
-            "color:#111;max-width:500px;margin:0 auto;padding:24px'>",
+            "color:#111;max-width:580px;margin:0 auto;padding:24px'>",
             "<p style='font-size:20px;font-weight:700;margin:0 0 4px'>Good morning! \U0001f4cd Poissy</p>",
             "<p style='color:#9ca3af;margin:0 0 20px;font-size:14px'>{}</p>".format(today_long),
             "<table style='width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;",
