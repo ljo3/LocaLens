@@ -8,61 +8,50 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/simple.css">
   <style>
-    /* ── Light mode (default) ── */
+    /* ── Theme tokens ── */
     :root {
-      --accent: #2563eb;
-      --light:  #eff6ff;
-      --muted:  #64748b;
-      --bg:     #f0f2f5;
-      --text:   #1e293b;
+      --accent:         #2563eb;
+      --light:          #eff6ff;
+      --muted:          #64748b;
+      --bg:             #f0f2f5;   /* SVG inner panel fill */
+      --surface:        #f0f2f5;   /* slide background */
+      --text:           #1e293b;
+      --highlight:      #1e40af;
+      --highlight-ring: #93c5fd;
     }
 
-    /* ── Light mode explicit rules ── */
-    .reveal, .reveal section,
-    .reveal p, .reveal li, .reveal ul { color: #1e293b !important; }
-    .reveal h1, .reveal h2, .reveal h3 { color: #2563eb !important; }
-    .reveal, .reveal .backgrounds { background-color: #f0f2f5 !important; }
-    .reveal .slide-background { background: #f0f2f5 !important; }
-
-    /* ── Dark mode — manual toggle (VS Code Dark+) ── */
+    /* ── Dark tokens — manual toggle ── */
     html[data-theme="dark"] {
-      --accent: #569cd6;
-      --light:  #252526;
-      --muted:  #858585;
+      --accent:         #569cd6;
+      --light:          #252526;
+      --muted:          #858585;
+      --bg:             #2d2d30;
+      --surface:        #1e1e1e;
+      --text:           #d4d4d4;
+      --highlight:      #0e639c;
+      --highlight-ring: #1e88e5;
     }
-    html[data-theme="dark"] .reveal,
-    html[data-theme="dark"] .reveal section,
-    html[data-theme="dark"] .reveal p,
-    html[data-theme="dark"] .reveal li,
-    html[data-theme="dark"] .reveal ul { color: #d4d4d4 !important; }
-    html[data-theme="dark"] .reveal h1,
-    html[data-theme="dark"] .reveal h2,
-    html[data-theme="dark"] .reveal h3 { color: #569cd6 !important; }
-    html[data-theme="dark"] .reveal,
-    html[data-theme="dark"] .reveal .backgrounds { background-color: #1e1e1e !important; }
-    html[data-theme="dark"] .reveal .slide-background { background: #1e1e1e !important; }
-    html[data-theme="dark"] .pipe-box.highlight { background: #0e639c !important; }
 
-    /* ── Dark mode — system preference (VS Code Dark+) ── */
+    /* ── Dark tokens — system preference (pre-JS / no-JS fallback) ── */
     @media (prefers-color-scheme: dark) {
       html:not([data-theme="light"]) {
-        --accent: #569cd6;
-        --light:  #252526;
-        --muted:  #858585;
+        --accent:         #569cd6;
+        --light:          #252526;
+        --muted:          #858585;
+        --bg:             #2d2d30;
+        --surface:        #1e1e1e;
+        --text:           #d4d4d4;
+        --highlight:      #0e639c;
+        --highlight-ring: #1e88e5;
       }
-      html:not([data-theme="light"]) .reveal,
-      html:not([data-theme="light"]) .reveal section,
-      html:not([data-theme="light"]) .reveal p,
-      html:not([data-theme="light"]) .reveal li,
-      html:not([data-theme="light"]) .reveal ul { color: #d4d4d4 !important; }
-      html:not([data-theme="light"]) .reveal h1,
-      html:not([data-theme="light"]) .reveal h2,
-      html:not([data-theme="light"]) .reveal h3 { color: #569cd6 !important; }
-      html:not([data-theme="light"]) .reveal,
-      html:not([data-theme="light"]) .reveal .backgrounds { background-color: #1e1e1e !important; }
-      html:not([data-theme="light"]) .reveal .slide-background { background: #1e1e1e !important; }
-      html:not([data-theme="light"]) .pipe-box.highlight { background: #0e639c !important; }
     }
+
+    /* ── Theme-aware rules (single source of truth) ── */
+    .reveal, .reveal section,
+    .reveal p, .reveal li, .reveal ul { color: var(--text) !important; }
+    .reveal h1, .reveal h2, .reveal h3 { color: var(--accent) !important; }
+    .reveal, .reveal .backgrounds { background-color: var(--surface) !important; }
+    .reveal .slide-background { background: var(--surface) !important; }
 
     #theme-toggle {
       position: fixed;
@@ -83,7 +72,6 @@
     .reveal { font-size: 26px; }
     .reveal h1 { font-size: 1.8em; }
     .reveal h2 { font-size: 1.3em; margin-bottom: 0.1em; }
-    .reveal h3 { }
     .reveal section { text-align: left; }
     .reveal .title-slide { text-align: center; }
     .reveal ul { margin-left: 1em; margin-top: 0.3em; }
@@ -110,8 +98,8 @@
       min-width: 90px;
     }
     .pipe-box.highlight {
-      background: #1e40af;
-      box-shadow: 0 0 0 3px #93c5fd;
+      background: var(--highlight);
+      box-shadow: 0 0 0 3px var(--highlight-ring);
     }
     .pipe-arrow {
       color: var(--accent);
@@ -171,8 +159,6 @@
       letter-spacing: 0.05em;
     }
 
-    .reveal .slides section .fragment { opacity: 1; visibility: visible; }
-
     .reveal .slide-number {
       position: fixed;
       bottom: 8px;
@@ -199,7 +185,7 @@
   <p style="font-size:0.8em;"><a href="https://localens.pages.dev" style="color:var(--accent);">localens.pages.dev</a></p>
   <br>
   <p class="label" style="text-transform:none; color:#c0674a;">Made By Lawrence</p>
-  <p class="label" style="text-transform:none;">May 2026</p>
+  <p class="label" style="text-transform:none;">June 2026</p>
 </section>
 
 <!-- ── 2. ARCHITECTURE ── -->
@@ -279,7 +265,7 @@
   </svg>
 </section>
 
-<!-- ── 2. WHAT IS LOCALENS ── -->
+<!-- ── 3. WHAT IS LOCALENS ── -->
 <section>
   <h2>What is LocaLens?</h2>
   <p class="label">Overview</p>
@@ -358,7 +344,7 @@
   </div>
 </section>
 
-<!-- ── 4. LOOKUP PIPELINE ── -->
+<!-- ── 5. LOOKUP PIPELINE ── -->
 <section>
   <h2>Lookup Pipeline</h2>
   <p class="label">Every input path converges on lookupCoords()</p>
@@ -384,7 +370,7 @@
   </div>
 </section>
 
-<!-- ── 5. TECH STACK ── -->
+<!-- ── 6. TECH STACK ── -->
 <section>
   <h2>Tech Stack</h2>
   <p class="label">Fully static · no backend · no API keys</p>
@@ -430,7 +416,7 @@
   </div>
 </section>
 
-<!-- ── 6. DEPLOYMENT ── -->
+<!-- ── 7. DEPLOYMENT ── -->
 <section>
   <h2>Deployment</h2>
   <p class="label">Static site — deploy anywhere</p>
@@ -479,17 +465,28 @@
   const root = document.documentElement;
 
   function currentTheme() {
-    if (root.hasAttribute('data-theme')) return root.getAttribute('data-theme');
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
   }
 
   function applyTheme(theme) {
     root.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
     btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  // Fix SVG marker-end references after hash routing changes the URL fragment
+  function fixMarkers() {
+    const base = location.href.split('#')[0];
+    document.querySelectorAll('[marker-end]').forEach(el => {
+      el.setAttribute('marker-end', `url(${base}#arr)`);
+    });
   }
 
   btn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
   applyTheme(currentTheme());
+  fixMarkers();
 
   Reveal.initialize({
     hash: true,
@@ -499,6 +496,7 @@
     transition: 'slide',
     transitionSpeed: 'fast',
   });
+  Reveal.on('slidechanged', fixMarkers);
 </script>
 </body>
 </html>
