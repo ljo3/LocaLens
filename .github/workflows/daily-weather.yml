@@ -2,7 +2,9 @@ name: Daily Weather · Poissy
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # 7 AM Paris time (CEST/UTC+2). In winter (CET) arrives at 6 AM.
+    - cron: '13 1 * * *'  # Targets ~7 AM Paris delivery; scheduled ~4h early since GitHub
+                          # Actions runs scheduled workflows 2-5h late (observed 07:44-10:15 UTC
+                          # for a 05:00 UTC schedule, i.e. mail arriving ~10-12 Paris instead of 7).
   workflow_dispatch:      # trigger manually to test
 
 permissions:
@@ -148,7 +150,7 @@ jobs:
       - name: Commit weather log
         run: |
           git config user.name  "ljo3"
-          git config user.email "lawrence.mk.johny@gmail.com"
+          git config user.email "ljohny996@gmail.com"
           git add weather-log.md
           git diff --staged --quiet || git commit -m "Weather log $(date -u +%Y-%m-%d)"
           git pull --rebase origin main
